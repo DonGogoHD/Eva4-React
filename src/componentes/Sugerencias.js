@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Sugerencias = () => {
-    const [personas, setPersonas] = useState([]);
+    const [personas, setPersonas] = useState(() => {
+        const savedPersonas = localStorage.getItem('personas');
+        return savedPersonas ? JSON.parse(savedPersonas) : [];
+    });
+
     const [editIndex, setEditIndex] = useState(-1);
     const [formData, setFormData] = useState({
         Nickname: '',
@@ -10,6 +14,10 @@ const Sugerencias = () => {
         region: '',
         EstadoEstudiante: ''
     });
+
+    useEffect(() => {
+        localStorage.setItem('personas', JSON.stringify(personas));
+    }, [personas]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -56,13 +64,11 @@ const Sugerencias = () => {
             region: '',
             EstadoEstudiante: ''
         });
-        toggleDownloadButton();
     };
 
     const deletePersona = (index) => {
         const updatedPersonas = personas.filter((_, i) => i !== index);
         setPersonas(updatedPersonas);
-        toggleDownloadButton();
     };
 
     const editPersona = (index) => {
@@ -94,15 +100,6 @@ const Sugerencias = () => {
                 checkbox.checked = false;
             }
         });
-    };
-
-    const toggleDownloadButton = () => {
-        const downloadButton = document.getElementById('downloadAllButton');
-        if (personas.length > 0) {
-            downloadButton.style.display = 'block';
-        } else {
-            downloadButton.style.display = 'none';
-        }
     };
 
     return (
@@ -232,10 +229,11 @@ const Sugerencias = () => {
             {personas.length > 0 && (
                 <button
                     id="downloadAllButton"
-                    style={{ display: 'block' }}
+                    className="download-button"
                     onClick={downloadAllPersonas}
+                    style={{ display: 'block' }}
                 >
-                    Descargar Todo
+                    Descargar sugerencias
                 </button>
             )}
         </section>
